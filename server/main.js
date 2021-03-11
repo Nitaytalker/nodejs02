@@ -2,14 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('./data/database')
-const dishModel = require('./Models/dish');
+const jokeModel = require('./Models/joke');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
 app.use(cors());
 
 app.get('/GiveMeTwo', (req, res) => {
-    dishModel.find({}, (err, documents) => {
+    jokeModel.find({}, (err, documents) => {
         if (err) {
             res.status(500).send('error')
         } else {
@@ -32,21 +32,27 @@ app.get('/GiveMeTwo', (req, res) => {
     })
 })
 
+app.get('/random', (req, res) => {
+    jokeModel.find({}, (err, documents) => {
+        err ? res.status(500).send('error') : res.status(200).send(documents[Math.floor(Math.random() * documents.length)]);
+    })
+})
+
 app.get('/', (req, res) => {
-    dishModel.find({}, (err, documents) => {
+    jokeModel.find({}, (err, documents) => {
         err ? res.status(500).send('error') : res.status(200).send(documents);
     })
 })
 
 app.post('/add', (req, res) => {
-    dishModel.find({ id: req.body.id }, (err, documents) => {
+    jokeModel.find({ id: req.body.id }, (err, documents) => {
         if (err) {
             res.status(500).send('error')
         } else if (documents.length > 0) {
             res.status(400).send('alerdy have this id');
         } else {
             // TODO : VALIDATION
-            const dish = new dishModel(req.body);
+            const dish = new jokeModel(req.body);
             dish.save().then(() => res.send("success")).catch((err) => console.log(err));
         }
     })
